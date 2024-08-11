@@ -9,6 +9,9 @@ $(document).ready(function() {
     });
 
     $('#spin-button').on('click', function() {
+        // disable the spin button and make him grey
+        $('#spin-button').prop('disabled', true);
+        $('#spin-button').css('background-color', 'grey');
         spinSlots();
     });
 
@@ -17,8 +20,10 @@ $(document).ready(function() {
     });
 
     function spinSlots() {
-        startSpinning();
-
+        // sets slots all to ? emojin before spinning
+        $('#slot1').text('❓');
+        $('#slot2').text('❓');
+        $('#slot3').text('❓');
         $.post('/roll', function(response) {
             stopSpinning(response.symbols, response.credits, response.win, response.reward);
         }).fail(function() {
