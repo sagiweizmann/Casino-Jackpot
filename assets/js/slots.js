@@ -1,5 +1,5 @@
 $(document).ready(function() {
-    let sessionCredits = 10;
+    let sessionCredits = 0;
     // call to /start to get the initial credits
     $.post('/start', function(response) {
         sessionCredits = response.credits;

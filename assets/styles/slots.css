@@ -91,7 +91,7 @@ button:active {
 .slot-machine-image {
     width: 100%;
     max-width: 510px;
-    height: 422px;
+    height: 500px;
     margin-bottom: 20px;
     background-size: cover;
     background-image: url('../images/slot-machine.png');
