@@ -26,4 +26,13 @@ class SlotsController extends AbstractController {
         $session->set('credits', 10);
         return new JsonResponse(['credits' => 10]);
     }
+
+    #[Route('/cashout', name: 'cash_out', methods: ['POST'])]
+    public function cashOut(SessionInterface $session): JsonResponse
+    {
+        $credits = $session->get('credits', 0);
+        $session->set('credits', 0);
+
+        return new JsonResponse(['cashed_out' => $credits]);
+    }
 }
