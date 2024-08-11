@@ -9,32 +9,17 @@
     {% block javascripts %}
         {% block importmap %}{{ importmap('app') }}{% endblock %}
     {% endblock %}
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>
-<div id="app">
-    <div class="doors">
-        <div class="door">
-            <div class="boxes">
-            </div>
-        </div>
-
-        <div class="door">
-            <div class="boxes">
-            </div>
-        </div>
-
-        <div class="door">
-            <div class="boxes">
-            </div>
-        </div>
-    </div>
-
-    <div class="buttons">
-        <button id="spinner">Spin</button>
-        <button id="reseter">Reset</button>
-    </div>
-
-    <p class="info"></p>
+<div class="slot-machine">
+    <div class="slot" id="slot1">X</div>
+    <div class="slot" id="slot2">X</div>
+    <div class="slot" id="slot3">X</div>
 </div>
+<button id="spin-button">Spin</button>
+<button id="cashout-button">Cash Out</button>
+<p id="credits">Credits: 10</p>
+<p id="message"></p>
 </body>
 </html>
