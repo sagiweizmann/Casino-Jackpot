@@ -59,21 +59,16 @@ class SlotsController extends AbstractController {
         ];
 
         $win = ($symbols[0] === $symbols[1]) && ($symbols[1] === $symbols[2]);
-        $cheat = false;
 
         if ($win) {
+            // Slightly cheat ;)
+            if ($credits >= 40 && $credits <= 60 && random_int(1, 100) <= 30) {
+                return $this->generateRoll($credits);
+            } else if ($credits > 60 && random_int(1, 100) <= 60) {
+                return $this->generateRoll($credits);
+            }
             $reward = self::REWARDS[$symbols[0]];
             $credits += $reward;
-
-
-            // Cheat logic
-            if ($credits >= 40 && $credits <= 60 && random_int(1, 100) <= 30) {
-                $cheat = true;
-                return $this->generateRoll($credits - $reward);
-            } elseif ($credits > 60 && random_int(1, 100) <= 60) {
-                $cheat = true;
-                return $this->generateRoll($credits - $reward);
-            }
         } else {
             $credits -= 1;
         }
@@ -83,7 +78,6 @@ class SlotsController extends AbstractController {
             'win' => $win,
             'reward' => $win ? $reward : 0,
             'credits' => $credits,
-            'cheat' => $cheat
         ];
     }
 }
