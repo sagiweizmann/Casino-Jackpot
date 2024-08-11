@@ -1,24 +1,29 @@
+html, body {
+    height: 100%;
+    margin: 0;
+}
+
 body {
     background-color: #f0f0f0;
     font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
     text-align: center;
-    padding: 20px;
 }
 
 .slot-machine {
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-bottom: 20px;
+    height: 500px;
+    gap: 25px;
 }
 
 .slot {
-    width: 80px;
+    width: 70px;
     height: 80px;
-    border: 2px solid #333;
-    border-radius: 10px;
-    background-color: #fff;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     margin: 5px;
     text-align: center;
     line-height: 80px;
@@ -45,7 +50,15 @@ body {
     0% { transform: translateY(0); }
     100% { transform: translateY(-300%); }
 }
-
+#buttons {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+#messages {
+    display: flex;
+    flex-direction: column;
+}
 button {
     background-color: #007bff;
     border: none;
@@ -74,3 +87,13 @@ button:active {
     font-size: 1.2rem;
     color: #333;
 }
+
+.slot-machine-image {
+    width: 100%;
+    max-width: 510px;
+    height: 422px;
+    margin-bottom: 20px;
+    background-size: cover;
+    background-image: url('../images/slot-machine.png');
+}
+

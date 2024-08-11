@@ -31,10 +31,6 @@ $(document).ready(function() {
         });
     }
 
-    function startSpinning() {
-        $('.slot').addClass('spinning');
-    }
-
     function stopSpinning(symbols, credits, win, reward) {
         setTimeout(function() {
             $('#slot1').removeClass('spinning').text(symbols[0]);
@@ -47,6 +43,8 @@ $(document).ready(function() {
             sessionCredits = credits;
             $('#credits').text('Credits: ' + sessionCredits);
             $('#message').text(win ? 'You won ' + reward + ' credits!' : 'You lost 1 credit.');
+            $('#spin-button').prop('disabled', false);
+            $('#spin-button').css('background-color', '#007bff');
         }, 3000);
     }
 
