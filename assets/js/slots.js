@@ -34,6 +34,7 @@ $(document).ready(function() {
         }
 
         $('#spin-button').prop('disabled', true).css('background-color', 'grey');
+        $('#cashout-button').prop('disabled', true).css('background-color', 'grey');
 
         if (spun) {
             resetSlots();
@@ -85,6 +86,7 @@ $(document).ready(function() {
             })
             .always(() => {
                 $('#spin-button').prop('disabled', false).css('background-color', '#007bff');
+                $('#cashout-button').prop('disabled', false).css('background-color', '#007bff');
             });
     }
 
