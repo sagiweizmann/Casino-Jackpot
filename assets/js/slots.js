@@ -1,124 +1,116 @@
 $(document).ready(function() {
     let sessionCredits = 0;
-    // call to /start to get the initial credits
-    $.post('/start', function(response) {
-        sessionCredits = response.credits;
-        $('#credits').text('Credits: ' + sessionCredits);
-    }).fail(function() {
-        $('#message').text('Failed to get the initial credits. Please try again.');
-    });
+    let spun = false;
 
-    init();
+    // Initialize the game
+    initializeGame();
 
-    $('#spin-button').on('click', function() {
+    // Event handlers
+    $('#spin-button').on('click', handleSpin);
+    $('#cashout-button').on('click', handleCashOut);
+
+    // Functions
+
+    function initializeGame() {
+        fetchInitialCredits();
+        initSlots();
+    }
+
+    function fetchInitialCredits() {
+        $.post('/start')
+            .done(response => {
+                sessionCredits = response.credits;
+                updateCreditsDisplay();
+            })
+            .fail(() => {
+                displayMessage('Failed to get the initial credits. Please try again.');
+            });
+    }
+
+    function handleSpin() {
         if (sessionCredits === 0) {
-            $('#message').text('You do not have enough credits to spin the slots.');
-        } else {
-            spin();
+            displayMessage('You do not have enough credits to spin the slots.');
+            return;
         }
-        $('#spin-button').prop('disabled', true);
-        $('#spin-button').css('background-color', 'grey');
 
-    });
+        $('#spin-button').prop('disabled', true).css('background-color', 'grey');
 
-    $('#cashout-button').on('click', function() {
-        cashOut();
-    });
+        if (spun) {
+            resetSlots();
+        }
+
+        spinSlots();
+        spun = true;
+    }
+
+    function handleCashOut() {
+        $.post('/cashout')
+            .done(response => {
+                sessionCredits = 0;
+                updateCreditsDisplay();
+                displayMessage('You cashed out ' + response.cashed_out + ' credits.');
+            })
+            .fail(() => {
+                displayMessage('Failed to cash out. Please try again.');
+            });
+    }
 
     function spinSlots() {
-        $.post('/roll', function(response) {
-            stopSpinning(response.symbols, response.credits, response.win, response.reward);
-        }).fail(function() {
-            $('#message').text('Failed to spin the slots. Please try again.');
-        });
-    }
-
-
-
-    function stopSpinning(symbols, credits, win, reward) {
-        setTimeout(function() {
-            $('#slot1Symbols .symbol').each(function() {
-                $(this).html(symbols[0]).hide().fadeIn(100);
-            });
-        }, 100);
-        setTimeout(function() {
-            $('#slot2Symbols .symbol').each(function() {
-                $(this).html(symbols[1]).hide().fadeIn(250);
-            });
-        }, 200);
-        setTimeout(function() {
-            $('#slot3Symbols .symbol').each(function() {
-                $(this).html(symbols[2]).hide().fadeIn(300);
-            });
-            sessionCredits = credits;
-            $('#credits').text('Credits: ' + sessionCredits);
-            $('#message').text(win ? 'You won ' + reward + ' credits!' : 'You lost 1 credit.');
-            $('#spin-button').prop('disabled', false);
-            $('#spin-button').css('background-color', '#007bff');
-        }, 350);
-    }
-
-    function cashOut() {
-        $.post('/cashout', function(response) {
-            $('#message').text('You cashed out ' + response.cashed_out + ' credits.');
-            sessionCredits = 0;
-            $('#credits').text('Credits: ' + sessionCredits);
-        }).fail(function() {
-            $('#message').text('Failed to cash out. Please try again.');
-        });
-    }
-
-    function createSymbolElement(symbol) {
-        return $('<div>').addClass('symbol').text(symbol);
-    }
-
-    let spun = false;
-    function spin() {
-        if (spun) {
-            reset();
-        }
-
         const $slots = $('.slot');
         let completedSlots = 0;
 
         $slots.each(function(index) {
             const $symbols = $(this).find('.symbols');
-            const $symbol = $symbols.find('.symbol');
-            const symbolHeight = $symbol.outerHeight();
-            const symbolCount = $symbols.children().length;
+            const randomOffset = getRandomOffset($symbols);
+            resetSlotSymbols();
 
-            $('#slot1Symbols .symbol').html('❓');
-            $('#slot2Symbols .symbol').html('❓');
-            $('#slot3Symbols .symbol').html('❓');
-
-            const totalDistance = symbolCount * symbolHeight;
-            const randomOffset = -Math.floor(Math.random() * (symbolCount - 1) + 1) * symbolHeight;
-            $symbols.css('top', `${randomOffset}px`);
-
-            $symbols.one('transitionend', function() {
+            $symbols.css('top', `${randomOffset}px`).one('transitionend', function() {
                 completedSlots++;
                 if (completedSlots === $slots.length) {
-                    spinSlots();
+                    triggerServerSpin();
                 }
             });
         });
-
-        spun = true;
     }
 
-    function reset() {
-        const $slots = $('.slot');
+    function triggerServerSpin() {
+        $.post('/roll')
+            .done(response => {
+                updateSlots(response.symbols);
+                updateCredits(response.credits);
+                displayResult(response.win, response.reward);
+            })
+            .fail(() => {
+                displayMessage('Failed to spin the slots. Please try again.');
+            })
+            .always(() => {
+                $('#spin-button').prop('disabled', false).css('background-color', '#007bff');
+            });
+    }
 
-        $slots.each(function() {
-            const $symbols = $(this).find('.symbols');
-            $symbols.css('transition', 'none');
-            $symbols.css('top', '0');
-            $symbols[0].offsetHeight; // Force reflow to apply the reset without transition
-            $symbols.css('transition', '');
+    function updateSlots(symbols) {
+        setTimeout(() => updateSlot('#slot1Symbols', symbols[0]), 100);
+        setTimeout(() => updateSlot('#slot2Symbols', symbols[1]), 250);
+        setTimeout(() => updateSlot('#slot3Symbols', symbols[2]), 400);
+    }
+
+    function updateSlot(selector, symbol) {
+        $(selector).find('.symbol').each(function() {
+            $(this).html(symbol).hide().fadeIn(100);
         });
     }
 
-    function init() {
+    function resetSlots() {
+        $('.slot .symbols').css({
+            'transition': 'none',
+            'top': '0'
+        }).each(function() {
+            this.offsetHeight; // Force reflow to apply the reset without transition
+            $(this).css('transition', '');
+        });
+    }
+
+    function initSlots() {
         const $slots = $('.slot');
         $slots.each(function() {
             const $symbols = $(this).find('.symbols');
@@ -128,4 +120,35 @@ $(document).ready(function() {
         });
     }
 
+    function resetSlotSymbols() {
+        $('#slot1Symbols .symbol, #slot2Symbols .symbol, #slot3Symbols .symbol').html('❓');
+    }
+
+    function getRandomOffset($symbols) {
+        const symbolHeight = $symbols.find('.symbol').outerHeight();
+        const symbolCount = $symbols.children().length;
+        return -Math.floor(Math.random() * (symbolCount - 1) + 1) * symbolHeight;
+    }
+
+    function createSymbolElement(symbol) {
+        return $('<div>').addClass('symbol').text(symbol);
+    }
+
+    function updateCredits(newCredits) {
+        sessionCredits = newCredits;
+        updateCreditsDisplay();
+    }
+
+    function updateCreditsDisplay() {
+        $('#credits').text('Credits: ' + sessionCredits);
+    }
+
+    function displayMessage(message) {
+        $('#message').text(message);
+    }
+
+    function displayResult(win, reward) {
+        const resultMessage = win ? `You won ${reward} credits!` : 'You lost 1 credit.';
+        displayMessage(resultMessage);
+    }
 });
