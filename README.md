@@ -1,62 +1,93 @@
-# Casino Jackpot Assignment
+# Slot Machine Game
+Casino Jackpot Game by Sagi Weizmann
 
-## Objective
+This is a simple slot machine game implemented in Symfony 7.1.0
+The game allows users to spin a slot machine, win or lose credits, and cash out their winnings.
 
-Congratulations! You've landed a summer gig in Las Vegas! Unfortunately, it's 2020, and the casinos are closed due to COVID-19. Your boss wants to move some of the business online and asks you to build a full-stack app — a simple slot machine game with a twist. Build it to ensure that the house always wins!
+## Table of Contents
+1. [Project Overview](#project-overview)
+2. [Assignment Readme](Assignment_README.md)
+3. [Running the Project](#running-the-project)
+4. [Development Journey](#development-journey)
+    - [Initial Setup](#initial-setup)
+    - [Refactoring](#refactoring)
+    - [Service Layer](#service-layer)
+    - [Challenges and Solutions](#challenges-and-solutions)
+5. [Endpoints](#endpoints)
 
-## Brief
+## Project Overview
+The game logic is implemented in PHP using the Symfony framework, and the frontend is handled using jQuery.
 
-When a player starts a game/session, they are allocated 10 credits. Pulling the machine lever (rolling the slots) costs 1 credit. The game screen has 1 row with 3 blocks. For players to win the roll, they have to get the same symbol in each block. There are 4 possible symbols:
+## Running the Project
 
-- Cherry (10 credits reward)
-- Lemon (20 credits reward)
-- Orange (30 credits reward)
-- Watermelon (40 credits reward)
+Be aware that you need PHP 8.2.0 or higher to run this project.
+The Symfony CLI is also required to start the server.
+The Symfony version used in this project is 7.1.0.
 
-The game (session) state has to be kept on the server. If the player keeps winning, they can play forever, but the house has something to say about that... There is a CASH OUT button on the screen, but there's a twist there as well.
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/your-repo/slot-machine-game.git
 
-## Tasks
+2. **Install dependencies:**
+   ```bash
+    composer install
 
-### General Requirements
+3. **Run the Symfony server:**
+    ```bash
+    symfony server:start
 
-- Implement the assignment using any language or framework you feel comfortable with.
-- When a user opens the app, a session is created on the server, and they have 10 starting credits.
+4. **Access the game in your browser:**
+   Open `http://localhost:8000` in your browser to play the slot machine game.
 
-### Server-side
+## Development Journey
 
-- When a user has less than 40 credits in the game session, their rolls are truly random.
-- If a user has between 40 and 60 credits, the server begins to slightly cheat:
-  - For each winning roll, before communicating back to the client, the server performs a 30% chance roll which decides if the server will re-roll that round.
-  - If the roll is true, then the server re-rolls and communicates the new result back.
-- If the user has above 60 credits, the server acts the same, but the chance of re-rolling the round increases to 60%.
-  - If the roll is true, then the server re-rolls and communicates the new result back.
-- There is a cash-out endpoint that moves credits from the game session to the user's account and closes the session.
+### Initial Setup
+The project began with a basic setup, where the game logic was embedded directly within the controller. The symbols and their corresponding rewards were defined as simple arrays. The game had three primary functionalities: start, spin, and cash out.
 
-### Client-side
+### Refactoring of the code
+To improve code maintainability and readability, the reward system was refactored to use enums. This refactoring allowed us to define `SlotSymbolEnum` for the symbols and `SlotRewardEnum` for the corresponding rewards. This approach provided type safety and made the code more self-explanatory.
 
-- Include a super simple, minimalistic table with 3 blocks in 1 row.
-- Include a button next to the table that starts the game.
-- The components for each sign can be a starting letter (C for cherry, L for lemon, O for orange, W for watermelon).
-- After submitting a roll request to the server, all blocks should enter a spinning state (can be 'X' character spinning).
-- After receiving a response from the server:
-  - The first sign should spin for 1 second more and then display the result.
-  - The second sign should display the result at 2 seconds.
-  - The third sign should display the result at 3 seconds.
-- If the user wins the round, their session credit is increased by the amount from the server response, otherwise, it is deducted by 1.
+### Service Layer
+As the project grew, it became clear that the slot machine logic should be encapsulated within a dedicated service. The `SlotMachineService` was introduced to handle all game-related logic, including managing symbols, calculating rewards, and updating the user's credits.
 
-## Evaluation Criteria
+- **SlotMachineService:** Encapsulates the core logic for the slot machine game, such as spinning the slots, determining wins, and calculating rewards.
 
-1. **Completeness**: Did you complete the features as briefed?
-2. **Correctness**: Does the solution perform in sensible, thought-out ways?
-3. **Maintainability**: Is the code written in a clean, maintainable way?
-4. **Testing**: Was the system adequately tested?
+During this phase, I encountered issues with autowiring the session service. Symfony's autowiring feature does not automatically inject the session, so I had to explicitly inject `SessionInterface` into the `SlotMachineService` constructor.
 
-## Code Submission
+### Challenges and Solutions
 
-Please organize, design, test, and document your code as if it were going into production. Then push your changes to the master branch. After you have pushed your code, you may submit the assignment on the assignment page.
+- **Frontend Slot machine spinning:** Implementing the spinning effect for the slot machine blocks was challenging. I used jQuery to animate the spinning effect, whic invovled many symbols going up in a random offest and then coming back down to the original position.
 
----
+- **Service Injection:** The session service was not autowired by default, causing errors. This was fixed by manually injecting the session into the `SlotMachineService`.
 
-All the best and happy coding,
+- **Enum to Integer Conversion:** While using enums for rewards, a type error occurred due to the inability to directly add enums to integers. because of PHP 8 Strict Types. This was resolved by casting the enum to an integer before performing arithmetic operations.
 
-**The Mano Security Team**
+## Endpoints
+
+### `/start` - POST
+- **Description:** Initializes the game session with starting credits.
+- **Response:**
+  ```json
+  {
+    "credits": 10
+  }
+
+### `/roll` - POST
+- **Description:** Spins the slot machine, deducting 1 credit per spin. Returns the result of the spin, including the symbols, win status, reward, and updated credits.
+- **Response:**
+  ```json
+  {
+    "symbols": ["🍒", "🍋", "🍊"],
+    "win": true,
+    "reward": 30,
+    "credits": 39
+  }
+  
+### `/cash-out` - POST
+
+- **Description:** Transfers the credits from the game session to the user's account and closes the session.
+- **Response:**
+  ```json
+    {
+    "cashed_out": 50
+    }
