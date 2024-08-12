@@ -2,8 +2,7 @@
 <p align="center">
   <img src="app.gif" alt="Slot Machine Game"/>
 </p>
-<br>
-Casino Jackpot Game by Sagi Weizmann
+<p align="center"> Casino Jackpot Game by Sagi Weizmann </p>
 <br>
 This is a simple slot machine game implemented in Symfony 7.1.0
 The game allows users to spin a slot machine, win or lose credits, and cash out their winnings.
