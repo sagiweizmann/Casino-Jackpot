@@ -1,6 +1,9 @@
 # Slot Machine Game
+
+![Slot Machine Game](app.gif)
 Casino Jackpot Game by Sagi Weizmann
 
+<br>
 This is a simple slot machine game implemented in Symfony 7.1.0
 The game allows users to spin a slot machine, win or lose credits, and cash out their winnings.
 
@@ -13,7 +16,7 @@ The game allows users to spin a slot machine, win or lose credits, and cash out 
     - [Refactoring](#refactoring)
     - [Service Layer](#service-layer)
     - [Challenges and Solutions](#challenges-and-solutions)
-5. [Endpoints](#endpoints)
+5. [Endpoints And Responses](#endpoints-and-responses)
 
 ## Project Overview
 The game logic is implemented in PHP using the Symfony framework, and the frontend is handled using jQuery.
@@ -41,20 +44,20 @@ The Symfony version used in this project is 7.1.0.
 
 ## Development Journey
 
-### Initial Setup
+#### Initial Setup
 The project began with a basic setup, where the game logic was embedded directly within the controller. The symbols and their corresponding rewards were defined as simple arrays. The game had three primary functionalities: start, spin, and cash out.
 
-### Refactoring of the code
-To improve code maintainability and readability, the reward system was refactored to use enums. This refactoring allowed us to define `SlotSymbolEnum` for the symbols and `SlotRewardEnum` for the corresponding rewards. This approach provided type safety and made the code more self-explanatory.
+#### Refactoring of the code
+To improve code maintainability and readability, the reward system was refactored to use enums. This refactoring allowed us to define `SlotSymbolEnum` for the symbols and `SlotRewardEnum` for the corresponding rewards.
+its made the code more self-explanatory.
 
-### Service Layer
-As the project grew, it became clear that the slot machine logic should be encapsulated within a dedicated service. The `SlotMachineService` was introduced to handle all game-related logic, including managing symbols, calculating rewards, and updating the user's credits.
+The `SlotMachineService` was introduced to handle all game-related logic, including managing symbols, calculating rewards, and updating the user's credits.
 
 - **SlotMachineService:** Encapsulates the core logic for the slot machine game, such as spinning the slots, determining wins, and calculating rewards.
 
-During this phase, I encountered issues with autowiring the session service. Symfony's autowiring feature does not automatically inject the session, so I had to explicitly inject `SessionInterface` into the `SlotMachineService` constructor.
+I had to explicitly inject `SessionInterface` into the `SlotMachineService` constructor.
 
-### Challenges and Solutions
+#### Challenges and Solutions
 
 - **Frontend Slot machine spinning:** Implementing the spinning effect for the slot machine blocks was challenging. I used jQuery to animate the spinning effect, whic invovled many symbols going up in a random offest and then coming back down to the original position.
 
@@ -62,9 +65,9 @@ During this phase, I encountered issues with autowiring the session service. Sym
 
 - **Enum to Integer Conversion:** While using enums for rewards, a type error occurred due to the inability to directly add enums to integers. because of PHP 8 Strict Types. This was resolved by casting the enum to an integer before performing arithmetic operations.
 
-## Endpoints
+## Endpoints and Responses
 
-### `/start` - POST
+### `/start` - GET
 - **Description:** Initializes the game session with starting credits.
 - **Response:**
   ```json
