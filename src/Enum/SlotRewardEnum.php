@@ -10,12 +10,12 @@ enum SlotRewardEnum: int {
     case ORANGE = 30;
     case WATERMELON = 40;
 
-    public static function getReward(SlotSymbolEnum $symbol): SlotRewardEnum {
+    public static function getReward(SlotSymbolEnum $symbol): int {
         return match($symbol) {
-            SlotSymbolEnum::CHERRY => self::CHERRY,
-            SlotSymbolEnum::LEMON => self::LEMON,
-            SlotSymbolEnum::ORANGE => self::ORANGE,
-            SlotSymbolEnum::WATERMELON => self::WATERMELON,
+            SlotSymbolEnum::CHERRY => self::CHERRY->value,
+            SlotSymbolEnum::LEMON => self::LEMON->value,
+            SlotSymbolEnum::ORANGE => self::ORANGE->value,
+            SlotSymbolEnum::WATERMELON => self::WATERMELON->value,
         };
     }
 }
