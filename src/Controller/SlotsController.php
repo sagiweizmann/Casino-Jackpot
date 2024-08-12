@@ -16,12 +16,12 @@ class SlotsController extends AbstractController
         $this->slotMachineService = $slotMachineService;
     }
 
-    #[Route('/')]
+    #[Route('/', name: 'main')]
     public function main() {
         return $this->render('slots/index.html.twig');
     }
 
-    #[Route('/start', name: 'start_game', methods: ['POST'])]
+    #[Route('/start', name: 'start_game', methods: ['GET'])]
     public function startGame(): JsonResponse
     {
         $credits = $this->slotMachineService->startGame();

@@ -17,7 +17,7 @@ $(document).ready(function() {
     }
 
     function fetchInitialCredits() {
-        $.post('/start')
+        $.get('/start')
             .done(response => {
                 sessionCredits = response.credits;
                 updateCreditsDisplay();
